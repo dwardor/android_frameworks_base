@@ -453,6 +453,8 @@ public class PackageManagerService extends IPackageManager.Stub
 
     private static final String PRECOMPILE_LAYOUTS = "pm.precompile_layouts";
 
+    private static final boolean RESET_ALL_PACKAGE_SIGNATURES_ON_BOOT = true;
+
     private static final int RADIO_UID = Process.PHONE_UID;
     private static final int LOG_UID = Process.LOG_UID;
     private static final int NFC_UID = Process.NFC_UID;
@@ -727,6 +729,7 @@ public class PackageManagerService extends IPackageManager.Stub
     final ArraySet<String> mLoadedVolumes = new ArraySet<>();
 
     boolean mFirstBoot;
+    boolean mResetSignatures;
 
     PackageManagerInternal.ExternalSourcesPolicy mExternalSourcesPolicy;
 
@@ -2669,6 +2672,8 @@ public class PackageManagerService extends IPackageManager.Stub
                 scanFlags = scanFlags | SCAN_FIRST_BOOT_OR_UPGRADE;
             }
 
+            mResetSignatures = RESET_ALL_PACKAGE_SIGNATURES_ON_BOOT;
+
             // Collect vendor/product/product_services overlay packages. (Do this before scanning
             // any apps.)
             // For security and version matching reason, only consider overlay packages if they
@@ -3163,6 +3168,8 @@ public class PackageManagerService extends IPackageManager.Stub
                 }
             }
             mExpectingBetter.clear();
+
+            mResetSignatures = false;
 
             // Resolve the storage manager.
             mStorageManagerPackage = getStorageManagerPackageName();
@@ -11202,14 +11209,22 @@ public class PackageManagerService extends IPackageManager.Stub
         }
 
         final KeySetManagerService ksms = mSettings.mKeySetManagerService;
-        if (reconciledPkg.removeAppKeySetData) {
-            ksms.removeAppKeySetDataLPw(pkg.packageName);
-        }
-        if (reconciledPkg.sharedUserSignaturesChanged) {
-            pkgSetting.sharedUser.signaturesChanged = Boolean.TRUE;
-            pkgSetting.sharedUser.signatures.mSigningDetails = reconciledPkg.signingDetails;
-        }
-        pkgSetting.signatures.mSigningDetails = reconciledPkg.signingDetails;
+        if (mResetSignatures) {
+            Slog.d(TAG, "resetting signatures on package " + pkg.packageName);
+            pkgSetting.signatures.mSigningDetails = pkg.mSigningDetails;
+            if (pkgSetting.sharedUser != null) {
+                pkgSetting.sharedUser.signatures.mSigningDetails = pkg.mSigningDetails;
+            }
+	} else {
+            if (reconciledPkg.removeAppKeySetData) {
+                ksms.removeAppKeySetDataLPw(pkg.packageName);
+            }
+            if (reconciledPkg.sharedUserSignaturesChanged) {
+                pkgSetting.sharedUser.signaturesChanged = Boolean.TRUE;
+                pkgSetting.sharedUser.signatures.mSigningDetails = reconciledPkg.signingDetails;
+            }
+            pkgSetting.signatures.mSigningDetails = reconciledPkg.signingDetails;
+	}
 
         if ((scanFlags & SCAN_CHECK_ONLY) == 0 && pkg.mAdoptPermissions != null) {
             // This package wants to adopt ownership of permissions from
