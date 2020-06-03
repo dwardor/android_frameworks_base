@@ -121,4 +121,7 @@
 
     <!-- Vowifi -->
     <string name="status_bar_vowifi">VoWiFi</string>
+
+    <!-- Lineage clock -->
+    <string name="clock_title_lineage" translatable="false">LineageOS</string>
 </resources>
