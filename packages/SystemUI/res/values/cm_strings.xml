@@ -136,4 +136,7 @@
 
     <!-- Channel name for Battery notifications -->
     <string name="battery_notification_channel_tv">Battery warning</string>
+
+    <!-- Volte -->
+    <string name="status_bar_volte">VoLTE</string>
 </resources>
