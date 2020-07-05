@@ -139,4 +139,5 @@
 
     <!-- Volte -->
     <string name="status_bar_volte">VoLTE</string>
+    <string name="status_bar_vowifi">VoWiFi</string>
 </resources>
