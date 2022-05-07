@@ -204,6 +204,8 @@ public class MobileMappings {
         public boolean hspaDataDistinguishable;
         public boolean alwaysShowDataRatIcon = false;
 
+        public boolean showVolteIcon = false;
+
         /**
          * Reads the latest configs.
          */
@@ -233,6 +235,7 @@ public class MobileMappings {
                 config.hideLtePlus = b.getBoolean(
                         CarrierConfigManager.KEY_HIDE_LTE_PLUS_DATA_ICON_BOOL);
             }
+            config.showVolteIcon = res.getBoolean(R.bool.config_display_volte);
             return config;
         }
     }

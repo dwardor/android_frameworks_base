@@ -147,7 +147,7 @@ public class WifiSignalController extends SignalController<WifiState, IconGroup>
                 mNetworkController.getNetworkNameForCarrierWiFi(mCurrentState.subId);
         MobileDataIndicators mobileDataIndicators = new MobileDataIndicators(
                 statusIcon, qsIcon, typeIcon, qsTypeIcon,
-                mCurrentState.activityIn, mCurrentState.activityOut, dataContentDescription,
+                mCurrentState.activityIn, mCurrentState.activityOut, /* volteIcon= */ 0, dataContentDescription,
                 dataContentDescriptionHtml, description,
                 mCurrentState.subId, /* roaming= */ false, /* showTriangle= */ true,
                 /* isDefault= */ qsIcon != null

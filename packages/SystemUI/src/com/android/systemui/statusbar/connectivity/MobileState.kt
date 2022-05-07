@@ -41,7 +41,10 @@ internal class MobileState(
     @JvmField var roaming: Boolean = false,
     @JvmField var dataState: Int = TelephonyManager.DATA_DISCONNECTED,
     // Tracks the on/off state of the defaultDataSubscription
-    @JvmField var defaultDataOff: Boolean = false
+    @JvmField var defaultDataOff: Boolean = false,
+    @JvmField var volteAvailable: Boolean = false,
+    @JvmField var showVolteIcon: Boolean = false,
+    // Tracks showing in status bar configuration change
 ) : ConnectivityState() {
 
     @JvmField var telephonyDisplayInfo = TelephonyDisplayInfo(TelephonyManager.NETWORK_TYPE_UNKNOWN,
@@ -86,6 +89,9 @@ internal class MobileState(
         roaming = o.roaming
         dataState = o.dataState
         defaultDataOff = o.defaultDataOff
+        volteAvailable = o.volteAvailable
+        showVolteIcon = o.showVolteIcon
+
 
         telephonyDisplayInfo = o.telephonyDisplayInfo
         serviceState = o.serviceState
@@ -125,6 +131,10 @@ internal class MobileState(
         return serviceState != null && serviceState!!.roaming
     }
 
+    fun getVoiceNetworkType(): Int { //useless maybe
+        return serviceState?.getVoiceNetworkType() ?: TelephonyManager.NETWORK_TYPE_UNKNOWN
+    }
+
     fun setFromMobileStatus(mobileStatus: MobileStatus) {
         activityIn = mobileStatus.activityIn
         activityOut = mobileStatus.activityOut
@@ -151,6 +161,8 @@ internal class MobileState(
         builder.append("userSetup=$userSetup,")
         builder.append("dataState=$dataState,")
         builder.append("defaultDataOff=$defaultDataOff,")
+        builder.append("volteAvailable=$volteAvailable,")
+        builder.append("showVolteIcon=$showVolteIcon,")
 
         // Computed properties
         builder.append("showQuickSettingsRatIcon=${showQuickSettingsRatIcon()},")
@@ -181,6 +193,9 @@ internal class MobileState(
         if (roaming != other.roaming) return false
         if (dataState != other.dataState) return false
         if (defaultDataOff != other.defaultDataOff) return false
+        if (volteAvailable != other.volteAvailable) return false
+        if (showVolteIcon != other.showVolteIcon) return false
+
         if (telephonyDisplayInfo != other.telephonyDisplayInfo) return false
         if (serviceState != other.serviceState) return false
         if (signalStrength != other.signalStrength) return false
