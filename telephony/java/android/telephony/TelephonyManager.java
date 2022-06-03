@@ -10504,7 +10504,7 @@ public class TelephonyManager {
        } catch (RemoteException | NullPointerException ex) {
            return false;
        }
-   }
+    }
 
     /**
      * The technology that IMS is registered for for the MMTEL feature.

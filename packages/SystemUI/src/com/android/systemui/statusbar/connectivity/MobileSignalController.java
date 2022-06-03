@@ -116,6 +116,8 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
     // Where to copy the next state into.
     private int mMobileStatusHistoryIndex;
 
+    private int mCallState = TelephonyManager.CALL_STATE_IDLE;
+
     private final MobileStatusTracker.Callback mMobileCallback =
             new MobileStatusTracker.Callback() {
                 private String mLastStatus;
@@ -195,7 +197,9 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
     private ImsManager mImsManager;
     private FeatureConnector<ImsManager> mFeatureConnector;
     private boolean mShowVolteIcon;
+    private boolean mShowVowifiIcon;
     private static final String SHOW_VOLTE_ICON = "show_volte_icon";
+    private static final String SHOW_VOWIFI_ICON = "show_vowifi_icon";
 
 
     // TODO: Reduce number of vars passed in, if we have the NetworkController, probably don't
@@ -269,6 +273,7 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
         mProviderModelSetting = featureFlags.isProviderModelSettingEnabled();
 
         Dependency.get(TunerService.class).addTunable(this, SHOW_VOLTE_ICON);
+        Dependency.get(TunerService.class).addTunable(this, SHOW_VOWIFI_ICON);
     }
 
     /* So user can select if he wants to see volte icon */
@@ -280,6 +285,13 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
                 Log.d(mTag, "mShowVolteIcon=" + mShowVolteIcon);
                 mCurrentState.showVolteIcon=mShowVolteIcon && mConfig.showVolteIcon;
                 notifyListenersIfNecessary();
+                break;
+            case SHOW_VOWIFI_ICON:
+                mShowVowifiIcon = TunerService.parseIntegerSwitch(newValue, false);
+                Log.d(mTag, "mShowVowifiIcon=" + mShowVowifiIcon);
+                mCurrentState.showVowifiIcon=mShowVowifiIcon && mConfig.showVowifiIcon;
+                notifyListenersIfNecessary();
+                break;
         }
     }
 
@@ -324,6 +336,11 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
                 true, mObserver);
         mContext.getContentResolver().registerContentObserver(Global.getUriFor(
                 Global.MOBILE_DATA + mSubscriptionInfo.getSubscriptionId()),
+                true, mObserver);
+        mContext.getContentResolver().registerContentObserver(Global.getUriFor(Global.DATA_ROAMING),
+                true, mObserver);
+        mContext.getContentResolver().registerContentObserver(Global.getUriFor(
+                Global.DATA_ROAMING + mSubscriptionInfo.getSubscriptionId()),
                 true, mObserver);
         mContext.registerReceiver(mVolteSwitchObserver,
                 new IntentFilter("org.codeaurora.intent.action.ACTION_ENHANCE_4G_SWITCH"));
@@ -445,9 +462,11 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
     private void queryImsState() {
         TelephonyManager tm = mPhone.createForSubscriptionId(mSubscriptionInfo.getSubscriptionId());
         mCurrentState.volteAvailable = tm.isVolteAvailable() || tm.isVideoTelephonyAvailable();
+        mCurrentState.vowifiAvailable = tm.isWifiCallingAvailable();
         if (DEBUG) {
             Log.d(mTag, "queryImsState tm=" + tm + " phone=" + mPhone
-                    + " volteAvailable=" + mCurrentState.volteAvailable);
+                    + " volteAvailable=" + mCurrentState.volteAvailable
+                    + " vowifiAvailable=" + mCurrentState.vowifiAvailable);
         }
         notifyListenersIfNecessary();
     }
@@ -562,6 +581,14 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
                     (mCurrentState.dataConnected && mCurrentState.isDefault) || dataDisabled;
             typeIcon =
                     (showDataIconInStatusBar || mConfig.alwaysShowDataRatIcon) ? dataTypeIcon : 0;
+            MobileIconGroup vowifiIconGroup = getVowifiIconGroup();
+            boolean vowifiIcon = mShowVowifiIcon && mConfig.showVowifiIcon && vowifiIconGroup != null;
+            if (vowifiIcon) {
+                typeIcon = vowifiIconGroup.dataType;
+                statusIcon = new IconState(true,
+                        mCurrentState.enabled && !mCurrentState.airplaneMode ? statusIcon.icon : 0,
+                        statusIcon.contentDescription);
+            }
             showTriangle = mCurrentState.enabled && !mCurrentState.airplaneMode;
         }
 
@@ -909,6 +936,10 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
         return !mPhone.isDataConnectionAllowed();
     }
 
+    private boolean isCallIdle() {
+        return mCallState == TelephonyManager.CALL_STATE_IDLE;
+    }
+
     @VisibleForTesting
     void setActivity(int activity) {
         mCurrentState.activityIn = activity == TelephonyManager.DATA_ACTIVITY_INOUT
@@ -926,6 +957,14 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
     @VisibleForTesting
     void setImsType(int imsType) {
         mImsType = imsType;
+    }
+
+    private MobileIconGroup getVowifiIconGroup() {
+        if (mCurrentState.vowifiAvailable) {
+            return !isCallIdle() ? TelephonyIcons.VOWIFI_CALLING : TelephonyIcons.VOWIFI;
+        } else {
+            return null;
+        }
     }
 
     @Override
