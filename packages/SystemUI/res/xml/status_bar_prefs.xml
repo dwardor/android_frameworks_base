@@ -103,6 +103,7 @@
         sysui:defValue="false" />
 
     <com.android.systemui.tuner.TunerSwitch
+        android:icon="@drawable/ic_statusbar_vowifi"
         android:key="show_vowifi_icon"
         android:title="@string/status_bar_vowifi"
         sysui:defValue="false" />
