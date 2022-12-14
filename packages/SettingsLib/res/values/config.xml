@@ -31,4 +31,7 @@
 
     <!-- Whether to show volte/ims icon in status bar -->
     <bool name="config_display_volte">true</bool>
+
+    <!-- Whether to show vowifi icon in status bar -->
+    <bool name="config_display_vowifi">true</bool>
 </resources>
