@@ -47,7 +47,10 @@ internal class MobileState(
     // Tracks the on/off state of the defaultDataSubscription
     @JvmField var defaultDataOff: Boolean = false,
     @JvmField var volteAvailable: Boolean = false,
+    @JvmField var vowifiAvailable: Boolean = false,
     @JvmField var showVolteIcon: Boolean = false,
+    // Tracks showing in status bar configuration change
+    @JvmField var showVowifiIcon: Boolean = false,
     // Tracks showing in status bar configuration change
 ) : ConnectivityState() {
 
@@ -99,7 +102,9 @@ internal class MobileState(
         dataState = o.dataState
         defaultDataOff = o.defaultDataOff
         volteAvailable = o.volteAvailable
+        vowifiAvailable = o.vowifiAvailable
         showVolteIcon = o.showVolteIcon
+        showVowifiIcon = o.showVowifiIcon
 
 
         telephonyDisplayInfo = o.telephonyDisplayInfo
@@ -187,7 +192,9 @@ internal class MobileState(
         builder.append("dataState=$dataState,")
         builder.append("defaultDataOff=$defaultDataOff,")
         builder.append("volteAvailable=$volteAvailable,")
+        builder.append("vowifiAvailable=$vowifiAvailable,")
         builder.append("showVolteIcon=$showVolteIcon,")
+        builder.append("showVowifiIcon=$showVowifiIcon,")
 
         // Computed properties
         builder.append("showQuickSettingsRatIcon=${showQuickSettingsRatIcon()},")
@@ -272,7 +279,9 @@ internal class MobileState(
         if (dataState != other.dataState) return false
         if (defaultDataOff != other.defaultDataOff) return false
         if (volteAvailable != other.volteAvailable) return false
+        if (vowifiAvailable != other.vowifiAvailable) return false
         if (showVolteIcon != other.showVolteIcon) return false
+        if (showVowifiIcon != other.showVowifiIcon) return false
 
         if (telephonyDisplayInfo != other.telephonyDisplayInfo) return false
         if (serviceState != other.serviceState) return false
