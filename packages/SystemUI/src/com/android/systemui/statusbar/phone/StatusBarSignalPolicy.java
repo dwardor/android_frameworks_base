@@ -196,7 +196,7 @@ public class StatusBarSignalPolicy implements SignalCallback,
             newState.activityOut = out;
             newState.contentDescription = indicators.statusIcon.contentDescription;
             MobileIconState first = getFirstMobileState();
-            newState.signalSpacerVisible = first != null && first.typeId != 0;
+            newState.signalSpacerVisible = first != null && (first.typeId != 0 || first.volteId != 0);
         }
         newState.slot = mSlotWifi;
         newState.airplaneSpacerVisible = mIsAirplaneMode;
@@ -206,7 +206,7 @@ public class StatusBarSignalPolicy implements SignalCallback,
 
     private void updateShowWifiSignalSpacer(WifiIconState state) {
         MobileIconState first = getFirstMobileState();
-        state.signalSpacerVisible = first != null && first.typeId != 0;
+        state.signalSpacerVisible = first != null && (first.typeId != 0 || first.volteId != 0);
     }
 
     private void updateWifiIconWithState(WifiIconState state) {
@@ -258,8 +258,10 @@ public class StatusBarSignalPolicy implements SignalCallback,
         }
 
         // Visibility of the data type indicator changed
-        boolean typeChanged = indicators.statusType != state.typeId
-                && (indicators.statusType == 0 || state.typeId == 0);
+        boolean typeChanged = (indicators.statusType != state.typeId 
+                && (indicators.statusType == 0 || state.typeId == 0))
+                || (indicators.volteIcon != state.volteId
+                && (indicators.volteIcon == 0 || state.volteId == 0));
 
         state.visible = indicators.statusIcon.visible && !mHideMobile;
         state.strengthId = indicators.statusIcon.icon;
@@ -270,6 +272,7 @@ public class StatusBarSignalPolicy implements SignalCallback,
         state.roaming = indicators.roaming;
         state.activityIn = indicators.activityIn && mActivityEnabled;
         state.activityOut = indicators.activityOut && mActivityEnabled;
+        state.volteId = indicators.volteIcon;
 
         if (DEBUG) {
             Log.d(TAG, "MobileIconStates: "
@@ -569,6 +572,7 @@ public class StatusBarSignalPolicy implements SignalCallback,
         public boolean roaming;
         public boolean needsLeadingPadding;
         public CharSequence typeContentDescription;
+        public int volteId;
 
         private MobileIconState(int subId) {
             super();
@@ -590,7 +594,8 @@ public class StatusBarSignalPolicy implements SignalCallback,
                     && showTriangle == that.showTriangle
                     && roaming == that.roaming
                     && needsLeadingPadding == that.needsLeadingPadding
-                    && Objects.equals(typeContentDescription, that.typeContentDescription);
+                    && Objects.equals(typeContentDescription, that.typeContentDescription)
+                    && volteId == that.volteId;
         }
 
         @Override
@@ -616,6 +621,7 @@ public class StatusBarSignalPolicy implements SignalCallback,
             other.roaming = roaming;
             other.needsLeadingPadding = needsLeadingPadding;
             other.typeContentDescription = typeContentDescription;
+            other.volteId = volteId;
         }
 
         private static List<MobileIconState> copyStates(List<MobileIconState> inStates) {
@@ -632,7 +638,8 @@ public class StatusBarSignalPolicy implements SignalCallback,
         @Override public String toString() {
             return "MobileIconState(subId=" + subId + ", strengthId=" + strengthId
                     + ", showTriangle=" + showTriangle + ", roaming=" + roaming
-                    + ", typeId=" + typeId + ", visible=" + visible + ")";
+                    + ", typeId=" + typeId + ", volteId=" + volteId
+                    + ", visible=" + visible + ")";
         }
     }
 }
