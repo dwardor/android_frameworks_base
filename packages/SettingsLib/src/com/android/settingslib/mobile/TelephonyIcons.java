@@ -177,26 +177,12 @@ public class TelephonyIcons {
 
     public static final MobileIconGroup VOWIFI = new MobileIconGroup(
             "VoWIFI",
-            null,
-            null,
-            AccessibilityContentDescriptions.PHONE_SIGNAL_STRENGTH,
-            0, 0,
-            0,
-            0,
-            AccessibilityContentDescriptions.PHONE_SIGNAL_STRENGTH[0],
             0,
             TelephonyIcons.ICON_VOWIFI
     );
 
     public static final MobileIconGroup VOWIFI_CALLING = new MobileIconGroup(
             "VoWIFICall",
-            null,
-            null,
-            AccessibilityContentDescriptions.PHONE_SIGNAL_STRENGTH,
-            0, 0,
-            0,
-            0,
-            AccessibilityContentDescriptions.PHONE_SIGNAL_STRENGTH[0],
             0,
             TelephonyIcons.ICON_VOWIFI_CALLING
     );
