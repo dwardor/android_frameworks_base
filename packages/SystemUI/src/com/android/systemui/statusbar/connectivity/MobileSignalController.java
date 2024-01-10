@@ -277,7 +277,9 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
                 true, mObserver);
         mContext.registerReceiver(mVolteSwitchObserver,
                 new IntentFilter("org.codeaurora.intent.action.ACTION_ENHANCE_4G_SWITCH"));
-        mFeatureConnector.connect();
+        if (mConfig.showVolteIcon || mConfig.showVowifiIcon) {
+            mFeatureConnector.connect();
+        }
     }
 
     /**
@@ -287,7 +289,9 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
         mMobileStatusTracker.setListening(false);
         mContext.getContentResolver().unregisterContentObserver(mObserver);
         mContext.unregisterReceiver(mVolteSwitchObserver);
-        mFeatureConnector.disconnect();
+        if (mConfig.showVolteIcon || mConfig.showVowifiIcon) {
+            mFeatureConnector.disconnect();
+        }
     }
 
     private void updateInflateSignalStrength() {
