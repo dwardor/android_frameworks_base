@@ -49,6 +49,7 @@ import com.android.systemui.statusbar.core.StatusBarRootModernization
 import com.android.systemui.statusbar.pipeline.dagger.MobileSummaryLog
 import com.android.systemui.statusbar.pipeline.mobile.StatusBarMobileIconKairos
 import com.android.systemui.statusbar.pipeline.mobile.data.model.SubscriptionModel
+import com.android.systemui.statusbar.pipeline.ims.data.repository.CommonImsRepository
 import com.android.systemui.statusbar.pipeline.mobile.data.repository.MobileConnectionRepositoryKairos
 import com.android.systemui.statusbar.pipeline.mobile.data.repository.MobileConnectionsRepositoryKairos
 import com.android.systemui.statusbar.pipeline.mobile.domain.model.SignalIconModel
@@ -124,6 +125,12 @@ interface MobileIconsInteractorKairos {
     /** True if we're configured to force-hide the mobile icons and false otherwise. */
     val isForceHidden: State<Boolean>
 
+    /** True if we're configured to force-hide the hd (VoLTE/VoNR) icon and false otherwise. */
+    val isMobileHdForceHidden: State<Boolean>
+
+    /** True if we're configured to force-hide the VoWifi icon and false otherwise. */
+    val isVoWifiForceHidden: State<Boolean>
+
     /**
      * True if the device-level service state (with -1 subscription id) reports emergency calls
      * only. This value is only useful when there are no other subscriptions OR all existing
@@ -143,6 +150,7 @@ constructor(
     connectivityRepository: ConnectivityRepository,
     userSetupRepo: UserSetupRepository,
     private val context: Context,
+    commonImsRepo: CommonImsRepository,
     private val featureFlagsClassic: FeatureFlagsClassic,
 ) : MobileIconsInteractorKairos, KairosBuilder by kairosBuilder() {
 
@@ -429,6 +437,14 @@ constructor(
             .map { it.contains(ConnectivitySlot.MOBILE) }
     }
 
+    override val isMobileHdForceHidden: State<Boolean> = buildState {
+        commonImsRepo.imsIconState.toState().map { !it.showHdIcon }
+    }
+
+    override val isVoWifiForceHidden: State<Boolean> = buildState {
+        commonImsRepo.imsIconState.toState().map { !it.showVowifiIcon }
+    }
+
     override val isDeviceInEmergencyCallsOnlyMode: State<Boolean>
         get() = mobileConnectionsRepo.isDeviceEmergencyCallCapable
 
@@ -446,6 +462,8 @@ constructor(
             defaultMobileIconGroup,
             isDefaultConnectionFailed,
             isForceHidden,
+            isMobileHdForceHidden,
+            isVoWifiForceHidden,
             repo,
             context,
         )
