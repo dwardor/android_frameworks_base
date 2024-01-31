@@ -129,6 +129,28 @@ fun BuildScope.MobileIconInteractorKairosAdapter(
                             "MobileIconInteractorKairosAdapter(subId=$subscriptionId).isForceHidden"
                         }
                 ),
+            isMobileHd = isMobileHd.toStateFlow(
+                nameTag {
+                    "MobileIconInteractorKairosAdapter(subId=$subscriptionId).isMobileHd"
+                }
+            ),
+            isMobileHdForceHidden = isMobileHdForceHidden.toColdConflatedFlow(
+                kairosNetwork,
+                nameTag {
+                    "MobileIconInteractorKairosAdapter(subId=$subscriptionId).isMobileHdForceHidden"
+                }
+            ),
+            isVoWifi = isVoWifi.toStateFlow(
+                nameTag {
+                    "MobileIconInteractorKairosAdapter(subId=$subscriptionId).isVoWifi"
+                }
+            ),
+            isVoWifiForceHidden = isVoWifiForceHidden.toColdConflatedFlow(
+                kairosNetwork,
+                nameTag {
+                    "MobileIconInteractorKairosAdapter(subId=$subscriptionId).isVoWifiForceHidden"
+                }
+            ),
             isAllowedDuringAirplaneMode =
                 isAllowedDuringAirplaneMode.toStateFlow(
                     nameTag {
@@ -163,6 +185,10 @@ private class MobileIconInteractorKairosAdapter(
     override val isSingleCarrier: StateFlow<Boolean>,
     override val isRoaming: StateFlow<Boolean>,
     override val isForceHidden: StateFlow<Boolean>,
+    override val isMobileHd: StateFlow<Boolean>,
+    override val isMobileHdForceHidden: Flow<Boolean>,
+    override val isVoWifi: StateFlow<Boolean>,
+    override val isVoWifiForceHidden: Flow<Boolean>,
     override val isAllowedDuringAirplaneMode: StateFlow<Boolean>,
     override val carrierNetworkChangeActive: StateFlow<Boolean>,
 ) : MobileIconInteractor
