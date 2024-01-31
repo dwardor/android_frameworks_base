@@ -18,7 +18,6 @@ package com.android.systemui.statusbar.pipeline.ims.data.repository
 
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
-import com.android.systemui.common.coroutine.ConflatedCallbackFlow.conflatedCallbackFlow
 import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Application
 import com.android.systemui.dagger.qualifiers.Background
@@ -33,6 +32,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -64,7 +64,7 @@ constructor(
     private var subIdRepositoryCache: MutableMap<Int, ImsRepository> =
         mutableMapOf()
 
-    private val mobileSubscriptionsChangeEvent: Flow<Unit> = conflatedCallbackFlow {
+    private val mobileSubscriptionsChangeEvent: Flow<Unit> = callbackFlow {
         val callback = object : SubscriptionManager.OnSubscriptionsChangedListener() {
             override fun onSubscriptionsChanged() {
                 trySend(Unit)
@@ -124,7 +124,7 @@ constructor(
             }
             .stateIn(scope, started = SharingStarted.WhileSubscribed(), listOf())
 
-    override val imsIconState: StateFlow<ImsIconModel> = conflatedCallbackFlow {
+    override val imsIconState: StateFlow<ImsIconModel> = callbackFlow {
         var showHdIcon = false
         var showVowifiIcon = false
         val callback =

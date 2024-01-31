@@ -123,6 +123,9 @@ interface MobileIconInteractorKairos {
     /** See [MobileIconsInteractor.isForceHidden]. */
     val isForceHidden: State<Boolean>
 
+    /** See [MobileIconsInteractor.isRoamingForceHidden]. */
+    val isRoamingForceHidden: State<Boolean>
+
     /** True when VoLTE/VONR available */
     val isMobileHd: State<Boolean>
 
@@ -153,6 +156,7 @@ class MobileIconInteractorKairosImpl(
     defaultMobileIconGroup: State<MobileIconGroup>,
     isDefaultConnectionFailed: State<Boolean>,
     override val isForceHidden: State<Boolean>,
+    override val isRoamingForceHidden: State<Boolean>,
     override val isMobileHdForceHidden: State<Boolean>,
     override val isVoWifiForceHidden: State<Boolean>,
     private val connectionRepository: MobileConnectionRepositoryKairos,
@@ -353,19 +357,28 @@ class MobileIconInteractorKairosImpl(
     // See b/346904529 for details
     private val satelliteShownLevel: State<Int> = connectionRepository.satelliteLevel
 
+    private val showRoaming: State<Boolean> =
+        combine(isRoaming, isRoamingForceHidden) { roaming, hidden -> roaming && !hidden }
+
     private val cellularIcon: State<SignalIconModel.CellularTypeIconModel.Cellular> =
         combine(
-            cellularShownLevel,
-            numberOfLevels,
-            showExclamationMarkForCellular,
-            carrierNetworkChangeActive,
-        ) { cellularShownLevel, numberOfLevels, showExclamationMark, carrierNetworkChange ->
-            SignalIconModel.CellularTypeIconModel.Cellular(
+            combine(
                 cellularShownLevel,
                 numberOfLevels,
-                showExclamationMark,
-                carrierNetworkChange,
-            )
+                showExclamationMarkForCellular,
+                carrierNetworkChangeActive,
+            ) { level, numLevels, showEx, carrierChange ->
+                SignalIconModel.CellularTypeIconModel.Cellular(
+                    level = level,
+                    numberOfLevels = numLevels,
+                    showExclamationMark = showEx,
+                    carrierNetworkChange = carrierChange,
+                    showRoaming = false,
+                )
+            },
+            showRoaming,
+        ) { icon, roaming ->
+            icon.copy(showRoaming = roaming)
         }
 
     private val satelliteIcon: State<SignalIconModel.Satellite> =

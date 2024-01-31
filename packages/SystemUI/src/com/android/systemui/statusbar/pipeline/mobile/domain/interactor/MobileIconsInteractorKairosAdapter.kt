@@ -121,6 +121,11 @@ constructor(
             )
             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
+    override val isRoamingForceHidden: Flow<Boolean> =
+        kairosInteractor.isRoamingForceHidden
+            .toColdConflatedFlow(kairosNetwork)
+            .stateIn(scope, SharingStarted.WhileSubscribed(), false)
+
     override val isMobileHdForceHidden: Flow<Boolean> =
         kairosInteractor.isMobileHdForceHidden
             .toColdConflatedFlow(kairosNetwork)
@@ -258,6 +263,7 @@ constructor(
             override val isSingleCarrier: Flow<Boolean> = latest { isSingleCarrier }
             override val isRoaming: Flow<Boolean> = latest { isRoaming }
             override val isForceHidden: Flow<Boolean> = latest { isForceHidden }
+            override val isRoamingForceHidden: Flow<Boolean> = latest { isRoamingForceHidden }
             override val isMobileHd: Flow<Boolean> = latest { isMobileHd }
             override val isMobileHdForceHidden: Flow<Boolean> = latest { isMobileHdForceHidden }
             override val isVoWifi: Flow<Boolean> = latest { isVoWifi }

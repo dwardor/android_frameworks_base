@@ -131,6 +131,9 @@ interface MobileIconsInteractor {
     /** True if we're configured to force-hide the mobile icons and false otherwise. */
     val isForceHidden: Flow<Boolean>
 
+    /** True if we're configured to force-hide the roaming and false otherwise. */
+    val isRoamingForceHidden: Flow<Boolean>
+
     /** True if we're configured to force-hide the hd (VoLTE/VoNR) and false otherwise. */
     val isMobileHdForceHidden: Flow<Boolean>
 
@@ -449,6 +452,11 @@ constructor(
             .map { it.contains(ConnectivitySlot.MOBILE) }
             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
+    override val isRoamingForceHidden: Flow<Boolean> =
+        connectivityRepository.forceHiddenSlots
+            .map { it.contains(ConnectivitySlot.ROAMING) }
+            .stateIn(scope, SharingStarted.WhileSubscribed(), false)
+
     override val isMobileHdForceHidden: Flow<Boolean> =
         commonImsRepo.imsIconState
             .map { !it.showHdIcon }
@@ -478,6 +486,7 @@ constructor(
                 defaultMobileIconGroup,
                 isDefaultConnectionFailed,
                 isForceHidden,
+                isRoamingForceHidden,
                 isMobileHdForceHidden,
                 isVoWifiForceHidden,
                 mobileConnectionsRepo.getRepoForSubId(subId),
