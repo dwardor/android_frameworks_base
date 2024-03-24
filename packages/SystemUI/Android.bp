@@ -208,6 +208,7 @@ android_library {
         "vendor.lineage.powershare-V1.0-java",
     ],
     libs: [
+        "ims-common",
         "keepanno-annotations",
     ],
     manifest: "AndroidManifest.xml",
@@ -367,6 +368,7 @@ android_library {
         "android.test.runner",
         "android.test.base",
         "android.test.mock",
+        "ims-common",
         "keepanno-annotations",
     ],
     kotlincflags: ["-Xjvm-default=all"],
@@ -505,6 +507,10 @@ android_app {
     system_ext_specific: true,
     certificate: "platform",
     privileged: true,
+
+    libs: [
+        "ims-common",
+    ],
 
     kotlincflags: ["-Xjvm-default=all"],
 
