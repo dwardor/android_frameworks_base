@@ -17,15 +17,17 @@ package com.android.systemui.statusbar.phone
 
 import android.annotation.IntDef
 import com.android.internal.statusbar.StatusBarIcon
+import com.android.systemui.statusbar.connectivity.ImsIconState;
 import com.android.systemui.statusbar.pipeline.icons.shared.model.ModernStatusBarViewCreator
 
 /** Wraps [com.android.internal.statusbar.StatusBarIcon] so we can still have a uniform list */
 open class StatusBarIconHolder private constructor() {
-    @IntDef(TYPE_ICON, TYPE_MOBILE_NEW, TYPE_WIFI_NEW, TYPE_BINDABLE)
+    @IntDef(TYPE_ICON, TYPE_MOBILE_NEW, TYPE_WIFI_NEW, TYPE_BINDABLE, TYPE_IMS)
     @Retention(AnnotationRetention.SOURCE)
     internal annotation class IconType
 
     var icon: StatusBarIcon? = null
+    var imsState: ImsIconState? = null
 
     @IconType
     open var type = TYPE_ICON
@@ -42,6 +44,7 @@ open class StatusBarIconHolder private constructor() {
                 // The new pipeline controls visibilities via the view model and
                 // view binder, so
                 // this is effectively an unused return value.
+		TYPE_IMS -> imsState!!.visible
                 TYPE_BINDABLE,
                 TYPE_MOBILE_NEW,
                 TYPE_WIFI_NEW -> true
@@ -53,6 +56,7 @@ open class StatusBarIconHolder private constructor() {
             }
             when (type) {
                 TYPE_ICON -> icon!!.visible = visible
+		TYPE_IMS -> imsState!!.visible = visible
                 TYPE_BINDABLE,
                 TYPE_MOBILE_NEW,
                 TYPE_WIFI_NEW -> {}
@@ -96,10 +100,13 @@ open class StatusBarIconHolder private constructor() {
         /** Only applicable to [BindableIconHolder] */
         const val TYPE_BINDABLE = 5
 
+	const val TYPE_IMS = 6
+
         /** Returns a human-readable string representing the given type. */
         fun getTypeString(@IconType type: Int): String {
             return when (type) {
                 TYPE_ICON -> "ICON"
+                TYPE_IMS -> "IMS"
                 TYPE_MOBILE_NEW -> "MOBILE_NEW"
                 TYPE_WIFI_NEW -> "WIFI_NEW"
                 else -> "UNKNOWN"
@@ -118,6 +125,14 @@ open class StatusBarIconHolder private constructor() {
         fun forNewWifiIcon(): StatusBarIconHolder {
             val holder = StatusBarIconHolder()
             holder.type = TYPE_WIFI_NEW
+            return holder
+        }
+
+        @JvmStatic
+        fun fromImsIconState(state: ImsIconState?): StatusBarIconHolder {
+            val holder = StatusBarIconHolder()
+	    holder.imsState = state
+            holder.type = TYPE_IMS
             return holder
         }
 
