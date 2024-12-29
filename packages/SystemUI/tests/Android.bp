@@ -38,6 +38,7 @@ android_test {
         "android.test.runner.stubs.system",
         "telephony-common",
         "android.test.base.stubs.system",
+        "ims-common",
     ],
     aaptflags: [
         "--extra-packages com.android.systemui",

@@ -138,4 +138,7 @@
 
     <!-- Channel name for Battery notifications -->
     <string name="battery_notification_channel_tv">Battery warning</string>
+
+    <!-- ims Volte/VoWifi -->
+    <string name="status_bar_ims">VoLTE/VoWiFi</string>
 </resources>

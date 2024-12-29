@@ -25,6 +25,7 @@ import android.util.ArraySet;
 import androidx.annotation.DrawableRes;
 
 import com.android.internal.statusbar.StatusBarIcon;
+import com.android.systemui.statusbar.connectivity.ImsIconState;
 import com.android.systemui.res.R;
 import com.android.systemui.statusbar.phone.StatusBarSignalPolicy.CallIndicatorIconState;
 
@@ -97,6 +98,8 @@ public interface StatusBarIconController {
 
     /** Sets whether the icon in the given slot should be visible or not. */
     void setIconVisibility(String slot, boolean b);
+
+    void setImsIcon(String slot, ImsIconState state);
 
     /**
      * Sets the live region mode for the icon
