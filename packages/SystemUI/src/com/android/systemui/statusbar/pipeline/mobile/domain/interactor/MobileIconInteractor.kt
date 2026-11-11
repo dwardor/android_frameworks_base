@@ -160,7 +160,6 @@ class MobileIconInteractorImpl(
     defaultMobileIconGroup: StateFlow<MobileIconGroup>,
     isDefaultConnectionFailed: StateFlow<Boolean>,
     override val isForceHidden: Flow<Boolean>,
-    override val isRoamingForceHidden: Flow<Boolean>,
     override val isMobileHdForceHidden: Flow<Boolean>,
     override val isVoWifiForceHidden: Flow<Boolean>,
     connectionRepository: MobileConnectionRepository,
@@ -348,15 +347,6 @@ class MobileIconInteractorImpl(
             }
             .stateIn(scope, SharingStarted.WhileSubscribed(), 0)
 
-    private val showRoaming: StateFlow<Boolean> =
-        combine(
-                isRoaming,
-                isRoamingForceHidden
-        ) { roaming, roamingForceHidden ->
-            roaming && !roamingForceHidden
-        }
-        .stateIn(scope, SharingStarted.WhileSubscribed(), false)
-
     // Satellite level is unaffected by the inflateSignalStrength property
     // See b/346904529 for details
     private val satelliteShownLevel: StateFlow<Int> =
@@ -382,14 +372,12 @@ class MobileIconInteractorImpl(
             numberOfLevels,
             showExclamationMarkForCellular,
             carrierNetworkChangeActive,
-            showRoaming,
-        ) { cellularShownLevel, numberOfLevels, showExclamationMark, carrierNetworkChange, showRoaming ->
+        ) { cellularShownLevel, numberOfLevels, showExclamationMark, carrierNetworkChange ->
             SignalIconModel.CellularTypeIconModel.Cellular(
                 cellularShownLevel,
                 numberOfLevels,
                 showExclamationMark,
                 carrierNetworkChange,
-                showRoaming,
             )
         }
 
@@ -422,7 +410,6 @@ class MobileIconInteractorImpl(
                 numberOfLevels.value,
                 showExclamationMarkForCellular.value,
                 carrierNetworkChangeActive.value,
-                showRoaming.value,
             )
         isNonTerrestrial
             .flatMapLatest { ntn ->

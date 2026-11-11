@@ -128,9 +128,6 @@ interface MobileIconsInteractorKairos {
     /** True if we're configured to force-hide the mobile icons and false otherwise. */
     val isForceHidden: State<Boolean>
 
-    /** True if we're configured to force-hide the roaming icon and false otherwise. */
-    val isRoamingForceHidden: State<Boolean>
-
     /** True if we're configured to force-hide the hd (VoLTE/VoNR) icon and false otherwise. */
     val isMobileHdForceHidden: State<Boolean>
 
@@ -454,12 +451,6 @@ constructor(
             .map { it.contains(ConnectivitySlot.MOBILE) }
     }
 
-    override val isRoamingForceHidden: State<Boolean> = buildState {
-        connectivityRepository.forceHiddenSlots.toState().map {
-            it.contains(ConnectivitySlot.ROAMING)
-        }
-    }
-
     override val isMobileHdForceHidden: State<Boolean> = buildState {
         commonImsRepo.imsIconState.toState().map { !it.showHdIcon }
     }
@@ -485,7 +476,6 @@ constructor(
             defaultMobileIconGroup,
             isDefaultConnectionFailed,
             isForceHidden,
-            isRoamingForceHidden,
             isMobileHdForceHidden,
             isVoWifiForceHidden,
             repo,
